@@ -1,0 +1,82 @@
+name: build_test_and_deploy
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build_test_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # === prepare stage ===
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Load repo vars
+        run: |
+          source ./_repo_vars.sh
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+
+      # === build stage ===
+      - name: Read Docker credentials from Vault
+        uses: hashicorp/vault-action@v3
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          exportEnv: true
+          secrets: |
+            kv/data/robert_accounts/dockerhub/personal_access_tokens/${{ env.PROJECT_NAME }}_deployment username | DOCKER_USERNAME ;
+            kv/data/robert_accounts/dockerhub/personal_access_tokens/${{ env.PROJECT_NAME }}_deployment password | DOCKER_PASSWORD ;
+            kv/data/memset/deployment/ssh SSH_KEY | SSH_KEY ;
+            kv/data/memset/deployment/ssh SSH_PORT | SSH_PORT ;
+            kv/data/memset/deployment/ssh SSH_HOST | SSH_HOST ;
+            kv/data/memset/deployment/ssh SSH_USER | SSH_USER
+
+      - name: Unit tests
+        run: |
+          source ./_repo_vars.sh && \
+          echo "Running uint tests for ${PROJECT_NAME}" && \
+          docker run --rm -v "$PWD/services:/opt/services" -w /opt/services \
+            ${RJM_PYTHON_TEST_IMAGE} \
+            sh -c "pip3 install --no-cache-dir -r ./src/requirements.txt && \
+                   pip3 install --no-cache-dir -r ./testContainer/requirements.txt && \
+                   SKIPSQLALCHEMYTESTS=Y python3 -m pytest ./test"
+
+      - name: Build frontend
+        run: |
+          source ./_repo_vars.sh && \
+          docker run --rm -v "$PWD:/opt/work" -w /opt/work \
+            ${QUASARBUILDIMAGE} \
+            -c "build_quasar_app ./frontend ${QUASARBUILDMODE} ${RJM_VERSION}"
+
+      - name: Build main image
+        run: |
+          source ./_repo_vars.sh && \
+          docker build --build-arg PROJECT_NAME="${PROJECT_NAME}" --build-arg QUASARBUILDMODE="${QUASARBUILDMODE}" -t ${DOCKER_USERNAME}/${PROJECT_NAME}:${RJM_VERSION} .
+
+      - name: Build test image
+        run: |
+          source ./_repo_vars.sh && \
+          docker build \
+            -t ${DOCKER_USERNAME}/${PROJECT_NAME}test:develop \
+            -f services/testContainer/Dockerfile services/testContainer
+
+      - name: Container level tests
+        run: |
+          source ./_repo_vars.sh && \
+          docker compose -f .github/compose-test.yml up --abort-on-container-exit --exit-code-from main_apptest
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: Push images to dockehub
+        run: |
+          source ./_repo_vars.sh && \
+          docker push ${DOCKER_USERNAME}/${PROJECT_NAME}:${RJM_VERSION}
