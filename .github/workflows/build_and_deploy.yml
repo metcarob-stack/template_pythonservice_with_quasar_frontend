@@ -18,6 +18,9 @@ jobs:
         run: |
           source ./_repo_vars.sh
           echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+          echo "RJM_VERSION=$RJM_VERSION" >> $GITHUB_ENV
+          echo "RJM_MAJOR_VERSION=$RJM_MAJOR_VERSION" >> $GITHUB_ENV
+          echo "TARGET_SERVER=$TARGET_SERVER" >> $GITHUB_ENV          
 
       # === build stage ===
       - name: Read Docker credentials from Vault
@@ -80,3 +83,54 @@ jobs:
         run: |
           source ./_repo_vars.sh && \
           docker push ${DOCKER_USERNAME}/${PROJECT_NAME}:${RJM_VERSION}
+
+      - name: Deploy to Docker Swarm
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          python3 - <<'PY' | ssh \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -i ~/.ssh/deploy_key \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST"
+
+          import json
+          import os
+
+          project_name = os.environ["PROJECT_NAME"]
+          rjm_major_version = os.environ["RJM_MAJOR_VERSION"]
+
+          request = {
+              "operation": "deploy",
+              "version": os.environ["RJM_VERSION"],
+              "project_name": project_name,
+              "target_server": os.environ["TARGET_SERVER"],
+              "docker_username": os.environ["DOCKER_USERNAME"],
+              "extra_environment": {
+                  "APIAPP_DEFAULTHOMEADMINUSERNAME": "admin",
+                  "APIAPP_APIURL": "https://api.metcarob.com/api",
+                  "APIAPP_APIDOCSURL": (
+                      f"https://api.metcarob.com/"
+                      f"{project_name}/"
+                      f"v{rjm_major_version}/public/web/apidocs"
+                  ),
+                  "APIAPP_FRONTENDURL": (
+                      f"https://api.metcarob.com/"
+                      f"{project_name}/"
+                      f"v{rjm_major_version}/public/web/frontend"
+                  ),
+                  "APIAPP_DEFAULTMASTERTENANTJWTCOLLECTIONALLOWEDORIGINFIELD": (
+                      "https://api.metcarob.com,"
+                      "https://localhost,"
+                      "http://localhost"
+                  )
+              }
+          }
+
+          print(json.dumps(request))
+          PY

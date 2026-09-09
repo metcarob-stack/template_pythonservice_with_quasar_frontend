@@ -33,3 +33,6 @@ export MEMSET_CLOUD_ROOT=/memset_cloud
 export QUASARBUILDIMAGE="metcarob/docker-build-quasar-app:0.0.35"
 #could be spa or pwa
 QUASARBUILDMODE=pwa
+
+export TARGET_SERVER="vx5-jt8u19"
+
