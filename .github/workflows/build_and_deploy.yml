@@ -31,10 +31,10 @@ jobs:
           secrets: |
             kv/data/robert_accounts/dockerhub/personal_access_tokens/${{ env.PROJECT_NAME }}_deployment username | DOCKER_USERNAME ;
             kv/data/robert_accounts/dockerhub/personal_access_tokens/${{ env.PROJECT_NAME }}_deployment password | DOCKER_PASSWORD ;
-            kv/data/memset/deployment/ssh SSH_KEY | SSH_KEY ;
-            kv/data/memset/deployment/ssh SSH_PORT | SSH_PORT ;
-            kv/data/memset/deployment/ssh SSH_HOST | SSH_HOST ;
-            kv/data/memset/deployment/ssh SSH_USER | SSH_USER
+            kv/data/asfplatform/webapps/{{ env.PROJECT_NAME }}/ssh SSH_KEY | SSH_KEY ;
+            kv/data/asfplatform/webapps/{{ env.PROJECT_NAME }}/ssh SSH_PORT | SSH_PORT ;
+            kv/data/asfplatform/webapps/{{ env.PROJECT_NAME }}/ssh SSH_HOST | SSH_HOST ;
+            kv/data/asfplatform/webapps/{{ env.PROJECT_NAME }}/ssh SSH_USER | SSH_USER
 
       - name: Unit tests
         run: |
@@ -76,7 +76,7 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
 
-      - name: Push images to dockehub
+      - name: Push images to Docker Hub
         run: |
           source ./_repo_vars.sh && \
           docker push ${DOCKER_USERNAME}/${PROJECT_NAME}:${RJM_VERSION}
