@@ -19,7 +19,6 @@ export DOCKER_IMAGENAME=${PROJECT_NAME}
 export RJM_USERMANAGEMENT_CONTAINER="metcarob/saas_user_management:0.1.26_nonkongver"
 
 export RJM_DOCKERWSCALLER_IMAGE="metcarob/docker-ws-caller:0.7.31"
-export RJM_DOCKER_KONG_API_URL="http://tasks.kong:8001"
 export RJM_DOCKER_SERVICE_NAME=${PROJECT_NAME}_${RJM_VERSION_UNDERSCORE}
 export RJM_DOCKER_SERVICE_URL=tasks.${RJM_DOCKER_SERVICE_NAME}
 
@@ -31,6 +30,6 @@ export AUTHED_ACL_BLACKLIST=""
 
 export MEMSET_CLOUD_ROOT=/memset_cloud
 
-export QUASARBUILDIMAGE="metcarob/docker-build-quasar-app:0.0.33"
+export QUASARBUILDIMAGE="metcarob/docker-build-quasar-app:0.0.35"
 #could be spa or pwa
 QUASARBUILDMODE=pwa
