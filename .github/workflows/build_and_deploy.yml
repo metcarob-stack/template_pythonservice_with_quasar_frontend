@@ -114,19 +114,19 @@ jobs:
               "docker_username": os.environ["DOCKER_USERNAME"],
               "extra_environment": {
                   "APIAPP_DEFAULTHOMEADMINUSERNAME": "admin",
-                  "APIAPP_APIURL": "https://api.metcarob.com/api",
+                  "APIAPP_APIURL": "https://api2.metcarob.com/api",
                   "APIAPP_APIDOCSURL": (
-                      f"https://api.metcarob.com/"
+                      f"https://api2.metcarob.com/"
                       f"{project_name}/"
                       f"v{rjm_major_version}/public/web/apidocs"
                   ),
                   "APIAPP_FRONTENDURL": (
-                      f"https://api.metcarob.com/"
+                      f"https://api2.metcarob.com/"
                       f"{project_name}/"
                       f"v{rjm_major_version}/public/web/frontend"
                   ),
                   "APIAPP_DEFAULTMASTERTENANTJWTCOLLECTIONALLOWEDORIGINFIELD": (
-                      "https://api.metcarob.com,"
+                      "https://api2.metcarob.com,"
                       "https://localhost,"
                       "http://localhost"
                   )
@@ -135,3 +135,17 @@ jobs:
 
           print(json.dumps(request))
           PY
+
+      - name: Test the newly deployed container using test endpoint
+        run: |
+          source ./_repo_vars.sh && \
+          sleep 5 && \
+          docker run --rm \
+            -e HTTPORIGIN_TO_TEST=https://api2.metcarob.com \
+            -e APIAPP_DEFAULTHOMEADMINUSERNAME=codefresh_test_user \
+            -e APIAPP_DEFAULTHOMEADMINPASSWORD=${SAASCODEFRESHTESTUSERPASSWORD} \
+            -e TESTPARAM_ENDPOINTURL=https://api2.metcarob.com/${PROJECT_NAME}/test/v${RJM_MAJOR_VERSION} \
+            -e TESTPARAM_THROUGHKONG="TRUE" \
+            -e TESTPARAM_EXPECTED_CONTAINER_VERSION="${RJM_VERSION}" \
+            ${DOCKER_USERNAME}/${PROJECT_NAME}test:develop \
+            python3 -m pytest /test
