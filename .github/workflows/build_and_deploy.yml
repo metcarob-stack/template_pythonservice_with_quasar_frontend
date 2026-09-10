@@ -129,7 +129,8 @@ jobs:
                       "https://api2.metcarob.com,"
                       "https://localhost,"
                       "http://localhost"
-                  )
+                  ),
+                  "APIAPP_JWTSECRETVAULT": "/memset/deployment/commonsecrets:APIAPP_JWTSECRET"
               }
           }
 
