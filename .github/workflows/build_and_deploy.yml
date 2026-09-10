@@ -130,7 +130,7 @@ jobs:
                       "https://localhost,"
                       "http://localhost"
                   ),
-                  "APIAPP_JWTSECRETVAULT": "/memset/deployment/commonsecrets:APIAPP_JWTSECRET"
+                  "APIAPP_JWTSECRETVAULT": "/asfplatform/webapps/_common:APIAPP_JWTSECRET"
               }
           }
 
