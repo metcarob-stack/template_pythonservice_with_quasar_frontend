@@ -59,7 +59,11 @@ jobs:
       - name: Build main image
         run: |
           source ./_repo_vars.sh && \
-          docker build --build-arg PROJECT_NAME="${PROJECT_NAME}" --build-arg QUASARBUILDMODE="${QUASARBUILDMODE}" -t ${DOCKER_USERNAME}/${PROJECT_NAME}:${RJM_VERSION} .
+          docker build --build-arg PROJECT_NAME="${PROJECT_NAME}" \
+          --build-arg QUASARBUILDMODE="${QUASARBUILDMODE}" \
+          -t ${DOCKER_USERNAME}/${PROJECT_NAME}:${RJM_VERSION} \
+          -t ghcr.io/${{ github.repository_owner }}/${PROJECT_NAME}:${RJM_VERSION} \          
+          .
 
       - name: Build test image
         run: |
