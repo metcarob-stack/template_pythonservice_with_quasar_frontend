@@ -136,6 +136,61 @@ jobs:
           print(json.dumps(request))
           PY
 
+      - name: Wait for deployed service
+        run: |
+          source ./_repo_vars.sh
+
+          URL="https://api2.metcarob.com/${PROJECT_NAME}/test/v${RJM_MAJOR_VERSION}/public/api/info/serverinfo"
+
+          for i in {1..30}; do
+            echo "Attempt $i/30: checking deployed service..."
+
+            RESPONSE=$(curl -sS --max-time 5 "$URL" || true)
+
+            if python3 - "$RESPONSE" "$PROJECT_NAME" "$RJM_VERSION" <<'PY'
+          import json
+          import sys
+
+          try:
+              response = json.loads(sys.argv[1])
+              expected_project = sys.argv[2]
+              expected_version = sys.argv[3]
+
+              server = response.get("Server", {})
+
+              if (
+                  server.get("APIAPP_PROJECT_NAME") == expected_project
+                  and server.get("Version") == expected_version
+              ):
+                  print(
+                      f"Service is ready: "
+                      f"{server.get('APIAPP_PROJECT_NAME')} "
+                      f"{server.get('Version')}"
+                  )
+                  sys.exit(0)
+
+              print(
+                  f"Wrong service/version: "
+                  f"project={server.get('APIAPP_PROJECT_NAME')!r}, "
+                  f"version={server.get('Version')!r}"
+              )
+
+          except (json.JSONDecodeError, IndexError):
+              print("Invalid or empty response")
+
+          sys.exit(1)
+          PY
+            then
+              echo "Deployment is ready"
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          echo "ERROR: New deployment was not available after 30 attempts"
+          exit 1
+
       - name: Test the newly deployed container using test endpoint
         run: |
           source ./_repo_vars.sh && \
