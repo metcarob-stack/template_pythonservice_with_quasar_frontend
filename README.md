@@ -80,6 +80,10 @@ VAULT_SECRET_ID -> from above
 In the repository also goto settings -> actions -> Workflow permissions
 and make sure it's read write.
 
+After the first deployment you will see the pacakge in github.
+click on it. on the right is package settings
+at the bottom you can make it private
+
 ## Deploy testing
 
 If the deployment works we should be good!
