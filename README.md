@@ -77,6 +77,9 @@ VAULT_ADDR -> https://vault.metcarob.com
 VAULT_ROLE_ID -> from above
 VAULT_SECRET_ID -> from above
 
+In the repository also goto settings -> actions -> Workflow permissions
+and make sure it's read write.
+
 ## Deploy testing
 
 If the deployment works we should be good!
