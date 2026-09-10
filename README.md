@@ -78,8 +78,8 @@ kv/data/robert_accounts/dockerhub/personal_access_tokens/${PROJECT_NAME}_deploym
 
 If the deployment works we should be good!
 
- - https://api.metcarob.com/templateservicename/v0/public/web/frontend/#/ works and loads serverinfo
- - curl https://api.metcarob.com/templateservicename/v0/public/api/info/serverinfo works
+ - https://api2.metcarob.com/templateservicename/v0/public/web/frontend/#/ works and loads serverinfo
+ - curl https://api2.metcarob.com/templateservicename/v0/public/api/info/serverinfo works
 
 Log in to usermanagement - this should work
 
