@@ -18,6 +18,16 @@ saas_user_management with. Find and replace all defaulttenant occurances
 
 Create the tenenat with this name in usermanagement.
 
+### Docker hub Credentials
+
+I store docker hub credentials in vault at /robert_accounts/dockerhub/personal_access_tokens/
+
+ - Log in to docker hub
+ - Create a repository with the project name
+ - goto account settings -> personal access tokens and create a new token
+ - name the token the same as the project name
+ - create a vault page for the project with two keys password and username.
+
 In _repo_vars update the versions of build containers I use:
 
 Run commands in new repo root:
