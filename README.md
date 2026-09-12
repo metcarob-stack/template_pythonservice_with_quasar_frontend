@@ -85,4 +85,4 @@ Log in to usermanagement - this should work
 
 ## Finally
 
- - Add endpoint to my service monitoring. (At least serverinfo and index pages)
+ - Add endpoint to my service monitoring spreadsheet. (At least serverinfo and index pages) https://docs.google.com/spreadsheets/d/18cpQLWf2OrPjCyyzhI3T1_W8q7CQvh3LUjGQvdp2pEc/edit?gid=0#gid=0
