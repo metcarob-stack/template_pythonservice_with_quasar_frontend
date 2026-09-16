@@ -26,7 +26,8 @@ function callApi ({
   path, // : queryString,
   method, // : 'get',
   postdata, // : null,
-  callback // : callback,
+  callback, // : callback,
+  tenantName // optional if undefined not added
 }) {
   if (typeof (apiPrefixes[prefix]) === 'undefined') {
     console.log('ERROR invalid prefix provided to callAPI - ', prefix, apiPrefixes)
@@ -36,10 +37,16 @@ function callApi ({
   if (typeof (router) !== 'undefined') {
     curPath = router.currentRoute.value.fullPath
   }
+  const getPathFn = function (tenantName, prefix, path) {
+    if (typeof (tenantName) === 'undefined') {
+      return apiPrefixes[prefix].path + path
+    }
+    return apiPrefixes[prefix].path + '/' + tenantName + path
+  }
   const userManagementClientStore = useUserManagementClientStoreStore()
   userManagementClientStore[apiPrefixes[prefix].storeFn]({
     endpoint: apiPrefixes[prefix].endpoint,
-    path: apiPrefixes[prefix].path + path,
+    path: getPathFn(tenantName, prefix, path),
     method,
     postdata,
     callback,
