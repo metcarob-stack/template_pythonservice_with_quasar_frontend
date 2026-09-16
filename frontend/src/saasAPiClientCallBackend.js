@@ -23,7 +23,6 @@ const apiPrefixes = {
 function callApi ({
   prefix, // must match prefix from apiPRefixes array
   router,
-  store,
   path, // : queryString,
   method, // : 'get',
   postdata, // : null,
