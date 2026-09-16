@@ -2,6 +2,7 @@
 This file contains functions to call the api client backends.
 */
 import { saasServiceName } from './router/routes.js'
+import { useUserManagementClientStoreStore } from 'stores/saasUserManagementClientStore'
 
 // const authedStoreFn = 'callAuthedAPI'
 const authedOrAnonStoreFn = 'callAuthedOrAnonAPI'
@@ -36,7 +37,8 @@ function callApi ({
   if (typeof (router) !== 'undefined') {
     curPath = router.currentRoute.value.fullPath
   }
-  store[apiPrefixes[prefix].storeFn]({
+  const userManagementClientStore = useUserManagementClientStoreStore()
+  userManagementClientStore[apiPrefixes[prefix].storeFn]({
     endpoint: apiPrefixes[prefix].endpoint,
     path: apiPrefixes[prefix].path + path,
     method,
